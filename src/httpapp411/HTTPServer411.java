@@ -6,7 +6,6 @@
 package httpapp411;
 
 // Adapted from Reese, JM (2015) Learning Network Programming with Java.
-
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -26,7 +25,7 @@ public class HTTPServer411 {
     public static void main(String[] args) throws Exception {
         System.out.println("MyHTTPServer Started");
         HttpServer server = HttpServer.create(new InetSocketAddress(80), 0);
-        server.createContext("/index", new DetailHandler());
+        server.createContext("/diary", new DetailHandler());
         server.setExecutor(Executors.newCachedThreadPool());
         server.setExecutor(Executors.newFixedThreadPool(5));
         server.start();
@@ -37,7 +36,8 @@ public class HTTPServer411 {
         responseBuffer
                 .append("<html><h1>HTTPServer Home Page.... </h1><br>")
                 .append("<b>Welcome to the new and improved web "
-                        + "server!</b><BR>")
+                        + "server!</b><br><br>")
+                .append("<b>INSERT FILE CONTENTS HERE</b><br>")
                 .append("</html>");
         return responseBuffer.toString();
     }
@@ -90,37 +90,40 @@ public class HTTPServer411 {
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
-                } else {
-                    System.out.println("Request body is empty");
-                }
-                // Manage response headers
-                Headers responseHeaders = exchange.getResponseHeaders();
+                } 
+                    // Manage response headers
+                    Headers responseHeaders = exchange.getResponseHeaders();
 
-                // Send response headers
-                String responseMessage = getResponse();
-                responseHeaders.set("Content-Type", "text/html");
-                responseHeaders.set("Server", "MyHTTPServer/1.0");
-                responseHeaders.set("Set-cookie", "userID=Cookie Monster");
-                exchange.sendResponseHeaders(200, responseMessage.getBytes().length);
+                    // Send response headers
+                    String responseMessage = getResponse();
+                    responseHeaders.set("Content-Type", "text/html");
+                    responseHeaders.set("Server", "MyHTTPServer/1.0");
+                    responseHeaders.set("Set-cookie", "userID=Cookie Monster");
+                    exchange.sendResponseHeaders(200, responseMessage.getBytes().length);
 
-                System.out.println("Response Headers");
-                Set<String> responseHeadersKeySet = responseHeaders.keySet();
-                responseHeadersKeySet
-                        .stream()
-                        .map((key) -> {
-                            List values = responseHeaders.get(key);
-                            String header = key + " = " + values.toString() + "\n";
-                            return header;
-                        })
-                        .forEach((header) -> {
-                            System.out.print(header);
-                        });
+                    System.out.println("Response Headers");
+                    Set<String> responseHeadersKeySet = responseHeaders.keySet();
+                    responseHeadersKeySet
+                            .stream()
+                            .map((key) -> {
+                                List values = responseHeaders.get(key);
+                                String header = key + " = " + values.toString() + "\n";
+                                return header;
+                            })
+                            .forEach((header) -> {
+                                System.out.print(header);
+                            });
 
-                // Send message body
-                try (OutputStream responseBody = exchange.getResponseBody()) {
-                    responseBody.write(responseMessage.getBytes());
-                }
+                    // Send message body
+                    try (OutputStream responseBody = exchange.getResponseBody()) {
+                        responseBody.write(responseMessage.getBytes());
+                    }
+                }else if (requestMethod.equalsIgnoreCase("POST")) {
+                    System.out.println("POST received");
+                    } else {
+
+                        System.out.println("Request body is empty");
+                    }
             }
         }
     }
-}
