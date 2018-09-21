@@ -11,16 +11,28 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.Executors;
 
 public class HTTPServer411 {
+
+    static File file = new File("diary.txt");
 
     public static void main(String[] args) throws Exception {
         System.out.println("MyHTTPServer Started");
@@ -31,13 +43,18 @@ public class HTTPServer411 {
         server.start();
     }
 
-    public static String getResponse() {
+    public static String getResponse() throws FileNotFoundException {
         StringBuilder responseBuffer = new StringBuilder();
+        Scanner in = new Scanner(file);
+        String data = " ";
+
+        while (in.hasNextLine()) {
+            data = data + " " + in.nextLine();
+        }
         responseBuffer
-                .append("<html><h1>HTTPServer Home Page.... </h1><br>")
-                .append("<b>Welcome to the new and improved web "
-                        + "server!</b><br><br>")
-                .append("<b>INSERT FILE CONTENTS HERE</b><br>")
+                .append("<html><h1>My Diary</h1><br>")
+                .append("<b>Welcome to the Diary!</b><br><br>")
+                .append(data.toString() + "<br>")
                 .append("</html>");
         return responseBuffer.toString();
     }
@@ -90,40 +107,50 @@ public class HTTPServer411 {
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
-                } 
-                    // Manage response headers
-                    Headers responseHeaders = exchange.getResponseHeaders();
+                }
+                // Manage response headers
+                Headers responseHeaders = exchange.getResponseHeaders();
 
-                    // Send response headers
-                    String responseMessage = getResponse();
-                    responseHeaders.set("Content-Type", "text/html");
-                    responseHeaders.set("Server", "MyHTTPServer/1.0");
-                    responseHeaders.set("Set-cookie", "userID=Cookie Monster");
-                    exchange.sendResponseHeaders(200, responseMessage.getBytes().length);
+                // Send response headers
+                String responseMessage = getResponse();
+                responseHeaders.set("Content-Type", "text/html");
+                responseHeaders.set("Server", "MyHTTPServer/1.0");
+                responseHeaders.set("Set-cookie", "userID=Cookie Monster");
+                exchange.sendResponseHeaders(200, responseMessage.getBytes().length);
 
-                    System.out.println("Response Headers");
-                    Set<String> responseHeadersKeySet = responseHeaders.keySet();
-                    responseHeadersKeySet
-                            .stream()
-                            .map((key) -> {
-                                List values = responseHeaders.get(key);
-                                String header = key + " = " + values.toString() + "\n";
-                                return header;
-                            })
-                            .forEach((header) -> {
-                                System.out.print(header);
-                            });
+                System.out.println("Response Headers");
+                Set<String> responseHeadersKeySet = responseHeaders.keySet();
+                responseHeadersKeySet
+                        .stream()
+                        .map((key) -> {
+                            List values = responseHeaders.get(key);
+                            String header = key + " = " + values.toString() + "\n";
+                            return header;
+                        })
+                        .forEach((header) -> {
+                            System.out.print(header);
+                        });
 
-                    // Send message body
-                    try (OutputStream responseBody = exchange.getResponseBody()) {
-                        responseBody.write(responseMessage.getBytes());
-                    }
-                }else if (requestMethod.equalsIgnoreCase("POST")) {
-                    System.out.println("POST received");
-                    } else {
+                // Send message body
+                try (OutputStream responseBody = exchange.getResponseBody()) {
+                    responseBody.write(responseMessage.getBytes());
+                }
+            } else if (requestMethod.equalsIgnoreCase("POST")) {
 
-                        System.out.println("Request body is empty");
-                    }
+                System.out.println("POST received");
+                String postData = "test";
+                BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
+                writer.append("\r\n");
+                writer.append(postData);
+                writer.close();
+
+            } else {
+
+                System.out.println("Request body is empty");
             }
         }
+
+        
+
     }
+}

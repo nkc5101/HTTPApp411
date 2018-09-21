@@ -52,7 +52,7 @@ public class HttpURLConnectionExample {
             String urlEncoded = urlQuery + URLEncoder.encode(userQuery, "UTF-8");
             System.out.println(urlEncoded);
             
-            String query = "http://127.0.0.1/index";
+            String query = "http://127.0.0.1/diary";
             URL url = new URL(query);
           url = new URL(urlEncoded);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -110,7 +110,7 @@ public class HttpURLConnectionExample {
 
     private void sendPost(String userInput) {
         try{
-            String postURL = "http://127.0.0.1/index";
+            String postURL = "http://127.0.0.1/diary";
             String postContent = "userInput=" + userInput;
             URL url = new URL(postURL);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
