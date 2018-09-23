@@ -8,7 +8,6 @@ package httpapp411;
 // Adapted from Reese, JM (2015) Learning Network Programming with Java.
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -20,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 public class HttpURLConnectionExample {
 
@@ -35,8 +33,9 @@ public class HttpURLConnectionExample {
         System.out.println("Sent Http GET request");
         
         
+        http.sendGet();
+        
         while(!userInput.equals("quit")){
-            http.sendGet();
             System.out.print("Diary entry: ");
             userInput = in.nextLine();
             http.sendPost(userInput);
@@ -111,7 +110,8 @@ public class HttpURLConnectionExample {
     private void sendPost(String userInput) {
         try{
             String postURL = "http://127.0.0.1/diary";
-            String postContent = "userInput=" + userInput;
+            String charSet = "utf-8";
+            String query = String.format("userContent=%s", URLEncoder.encode(userInput, charSet));
             URL url = new URL(postURL);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
@@ -119,16 +119,15 @@ public class HttpURLConnectionExample {
             
             connection.setDoOutput(true);
             OutputStream out = connection.getOutputStream();
-            out.write(postContent.getBytes());
+            out.write(query.getBytes());
             
             int responseCode = connection.getResponseCode();
-            System.out.println("POST Response Code:: " + responseCode);
-            
-            if(responseCode == HttpURLConnection.HTTP_OK){
+
+            System.out.println("Response Code: " + responseCode);
+            if (responseCode == 200) {
                 String response = getResponse(connection);
                 System.out.println("response: " + response.toString());
-                
-            } else{
+            } else {
                 System.out.println("Bad Response Code: " + responseCode);
             }
         } catch(Exception ex){
