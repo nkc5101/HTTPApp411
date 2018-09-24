@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.net.URLDecoder;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -138,6 +139,7 @@ public class HTTPServer411 {
                 InputStreamReader isr = new InputStreamReader(exchange.getRequestBody(), "utf-8");
                 BufferedReader br = new BufferedReader(isr);
                 String query = br.readLine();
+                query = URLDecoder.decode(query, "utf-8");
                 String[] postData = query.split("=");
                 BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
                 writer.append("\r\n");
