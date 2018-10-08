@@ -33,8 +33,7 @@ public class JsonServer {
     public static void main(String[] args) throws IOException {
         System.out.println("MyHTTPServer Started");
         HttpServer server = HttpServer.create(new InetSocketAddress(80), 0);
-        server.createContext("/get", new DetailHandler());
-        server.createContext("/post", new DetailHandler());
+        server.createContext("/users", new DetailHandler());
         server.setExecutor(Executors.newCachedThreadPool());
         server.setExecutor(Executors.newFixedThreadPool(5));
         server.start();
@@ -53,7 +52,7 @@ public class JsonServer {
         }
 
         private void getHandler(HttpExchange exchange) throws IOException {
-            System.out.println("GET request Received");
+            System.out.println("GET Request Received");
 
             Headers requestHeaders = exchange.getRequestHeaders();
             String query;
@@ -90,7 +89,7 @@ public class JsonServer {
         }
 
         private void postHandler(HttpExchange exchange) throws UnsupportedEncodingException, IOException {
-            System.out.println("POST received");
+            System.out.println("POST Received");
             Map<String, Object> parameters = (Map<String, Object>) exchange.getAttribute("parameters");
             InputStreamReader isr = new InputStreamReader(exchange.getRequestBody(), "utf-8");
             BufferedReader br = new BufferedReader(isr);
@@ -118,3 +117,4 @@ public class JsonServer {
     }
 
 }
+

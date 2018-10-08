@@ -61,7 +61,7 @@ public class JsonClient {
         Gson gson = new Gson();
 
         try {
-            String getURL = "http://127.0.0.1/get";
+            String getURL = "http://127.0.0.1/users";
             String charSet = "utf-8";
             URL url = new URL(getURL);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -87,7 +87,7 @@ public class JsonClient {
         Gson gson = new Gson();
         String jsonEmp = gson.toJson(newUser);
         try {
-            String postURL = "http://127.0.0.1/post";
+            String postURL = "http://127.0.0.1/users";
             String charSet = "utf-8";
             String query = String.format("userContent=%s", URLEncoder.encode(jsonEmp, charSet));
             URL url = new URL(postURL);
